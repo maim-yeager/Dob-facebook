@@ -3,8 +3,13 @@ services:
   - type: worker
     name: maim-dob-bot
     env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: python maim_dob_bot.py
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    startCommand: python maim_bot.py
     envVars:
       - key: BOT_TOKEN
         sync: false
+        required: true
+      - key: PYTHON_VERSION
+        value: 3.11.0
