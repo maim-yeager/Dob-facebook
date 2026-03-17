@@ -590,6 +590,42 @@ def handle_profile(message):
     finally:
         loop.close()
 
+# পুরনো অংশ:
+# if __name__ == "__main__":
+#     logger.info("🚀 Enterprise DOB Extractor v5.0 Starting...")
+#     bot.infinity_polling()
+
+# নতুন অংশ:
 if __name__ == "__main__":
-    logger.info("🚀 Enterprise DOB Extractor v5.0 Starting...")
-    bot.infinity_polling()
+    import os
+    from flask import Flask, request
+    
+    # Flask app তৈরি
+    app = Flask(__name__)
+    
+    # Render এর দেওয়া URL পাবেন
+    RENDER_URL = os.environ.get('RENDER_EXTERNAL_URL')
+    BOT_TOKEN = os.environ.get('BOT_TOKEN')
+    
+    # Webhook route
+    @app.route(f'/{BOT_TOKEN}', methods=['POST'])
+    def webhook():
+        json_str = request.get_data().decode('UTF-8')
+        update = telebot.types.Update.de_json(json_str)
+        bot.process_new_updates([update])
+        return '!', 200
+    
+    @app.route('/')
+    def index():
+        return 'Bot is running!', 200
+    
+    # Webhook সেটআপ
+    bot.remove_webhook()
+    time.sleep(1)
+    webhook_url = f"{RENDER_URL}/{BOT_TOKEN}"
+    bot.set_webhook(url=webhook_url)
+    
+    logger.info(f"✅ Webhook set to: {webhook_url}")
+    
+    # Flask app চালু
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
