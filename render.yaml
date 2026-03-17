@@ -1,0 +1,10 @@
+# render.yaml
+services:
+  - type: worker
+    name: maim-dob-bot
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python maim_dob_bot.py
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
